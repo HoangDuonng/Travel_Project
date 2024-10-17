@@ -1,7 +1,9 @@
 const express = require('express');
 const path = require("path");
-const db = require('./config/database');
+const cookieParser = require('cookie-parser');
 
+
+const db = require('./config/database');
 const Router = require('./routers/index');
 const fileUpload = require('express-fileupload');
 
@@ -13,10 +15,10 @@ const app = express();
 db.getConnection();
 const PORT = process.env.PORT || 4000;
 
-// Middleware để xử lý file
+// Middleware 
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(fileUpload());
-
-// Middleware để xử lý JSON
 app.use(express.json());
 
 // Router

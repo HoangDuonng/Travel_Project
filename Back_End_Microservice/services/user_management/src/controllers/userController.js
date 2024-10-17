@@ -1,6 +1,8 @@
 const { uploadSingleFile } = require('../services/uploadService');
 const userServices = require('../services/userService');
+const bcrypt = require("bcrypt");
 
+// GET ALL USER
 const getAllUser = async (req, res) => {
     let result = await userServices.getAllUserService();
     
@@ -10,43 +12,71 @@ const getAllUser = async (req, res) => {
     });
 };
 
-const createAUser = async (req, res) => {
-
-    let { email, username, password, displayname, phone, bio, socials, role } = req.body;
-
-    let avatar = '';
-    let cover_photo = '';
-    if (!req.files || Object.keys(req.files).length === 0) {
-        // do nothing
-    } else {
-        let result = await uploadSingleFile(req.files.image);
-        // console.log(' check res :', result.path);
-        avatar = result.path;
-        cover_photo = result.path;
-    }
-
-    let data = {
-        email: email,
-        username: username,
-        password: password,
-        displayname: displayname,
-        phone: phone,
-        bio: bio,
-        socials: socials,
-        avatar: avatar,
-        cover_photo: cover_photo,
-        role: role,
-    };
-
-    let result = await userServices.createAUserService(data);
-    // console.log('check data: ', result);
-
+// GET A USER
+const getAUser = async (req, res) => {
+    let id = req.body.id;
+    let result = await userServices.getUserByIdService(id);
     return res.status(200).json({
         message: 'success',
         data: result,
     });
 };
 
+
+// REGISTER
+const createAUser = async (req, res) => {
+    try {
+        let { email, username, displayname, phone, bio, socials, role } = req.body;
+        
+        const salt = await bcrypt.genSalt(10);
+        const hashed = await bcrypt.hash(req.body.password, salt);
+
+        let avatar = '';
+        let cover_photo = '';
+        if (!req.files || Object.keys(req.files).length === 0) {
+            // do nothing
+        } else {
+            let result = await uploadSingleFile(req.files.image);
+            // console.log(' check res :', result.path);
+            avatar = result.path;
+            cover_photo = result.path;
+        }
+
+        let data = {
+            email: email,
+            username: username,
+            password: hashed,
+            displayname: displayname,
+            phone: phone,
+            bio: bio,
+            socials: socials,
+            avatar: avatar,
+            cover_photo: cover_photo,
+            role: role,
+        };
+
+        let result = await userServices.createAUserService(data);
+        // Kiểm tra kết quả trả về từ service
+        if (result.message === 'success') {
+            return res.status(201).json({
+                status: 'success',
+                data: result.data
+            });
+        } else {
+            return res.status(400).json({
+                status: 'fail',
+                message: result.error
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Server error'
+        });
+    }
+};
+
+// UPDATE
 const updateAUser = async (req, res) => {
     let { id, email, username, password, displayname, phone, bio, socials, role } = req.body;
     
@@ -112,13 +142,21 @@ const updateAUser = async (req, res) => {
 };
 
 const deleteAUser = async (req, res) => {
-    let id = req.body.id;
-
-    let result = await userServices.deleteAUserService(id);
-    console.log('check data: ', result);
     return res.status(200).json({
-        EC: 0,
-        data: result,
+        message: 'success',
+        data: 'Delete user successfully',
     });
+
+    //                                xong vụ JWT thì mở ra
+    // let id = req.body.id;
+
+    // let result = await userServices.deleteAUserService(id);
+    // console.log('check data: ', result);
+    // return res.status(200).json({
+    //     message: 'success',
+    //     data: result,
+    // });
 };
-module.exports = { createAUser, updateAUser, deleteAUser, getAllUser };
+
+
+module.exports = { createAUser, updateAUser, deleteAUser, getAllUser, getAUser };
