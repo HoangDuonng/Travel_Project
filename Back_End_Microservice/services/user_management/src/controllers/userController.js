@@ -142,21 +142,14 @@ const updateAUser = async (req, res) => {
 };
 
 const deleteAUser = async (req, res) => {
+    let id = req.body.id;
+
+    let result = await userServices.deleteAUserService(id);
+    console.log('check data: ', result);
     return res.status(200).json({
         message: 'success',
-        data: 'Delete user successfully',
+        data: result,
     });
-
-    //                                xong vụ JWT thì mở ra
-    // let id = req.body.id;
-
-    // let result = await userServices.deleteAUserService(id);
-    // console.log('check data: ', result);
-    // return res.status(200).json({
-    //     message: 'success',
-    //     data: result,
-    // });
 };
-
 
 module.exports = { createAUser, updateAUser, deleteAUser, getAllUser, getAUser };
