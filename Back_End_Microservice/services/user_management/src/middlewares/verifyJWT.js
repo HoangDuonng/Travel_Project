@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const verifyToken = (req, res, next) => {
   //ACCESS TOKEN FROM HEADER, REFRESH TOKEN FROM COOKIE
   const token = req.headers.token;
-  // const refreshToken = req.cookies.refreshToken;
   if (token) {
     const accessToken = token.split(" ")[1];
     jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
