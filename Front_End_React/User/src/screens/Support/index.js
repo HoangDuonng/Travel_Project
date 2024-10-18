@@ -9,9 +9,9 @@ const Support = () => {
   return (
     <>
       <Main />
-      <Topics />
+      {/* <Topics /> */}
       <Faq />
-      <Live title="Awesome desitinations" />
+      {/* <Live title="Awesome desitinations" /> */}
     </>
   );
 };

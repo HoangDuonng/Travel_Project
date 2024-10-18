@@ -56,6 +56,22 @@ function App() {
         />
         <Route
           exact
+          path="/test_360"
+          render={() => (
+              <iframe 
+                src=".\360_VR\tour.html"
+                title="Embedded Page"
+                style={{ 
+                  width: '100%', 
+                  height: '100vh',
+                  display: 'block'   
+                }} 
+              />
+          )}
+        />
+
+        <Route
+          exact
           path="/stays-product"
           render={() => (
             <Page separatorHeader>

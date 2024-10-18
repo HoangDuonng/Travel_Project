@@ -34,8 +34,9 @@ const gallery = [
 const Main = () => {
   const [search, setSearch] = useState("");
 
-  const handleSubmit = (e) => {
-    alert();
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    alert("Search developing");
   };
 
   return (
@@ -64,7 +65,8 @@ const Main = () => {
           big
           value={search}
           setValue={setSearch}
-          onSubmit={() => handleSubmit()}
+          // onSubmit={() => handleSubmit()}
+          onSubmit={handleSubmit}
           placeholder="Search anything"
           type="text"
           name="search"

@@ -8,25 +8,25 @@ import Loader from "../Loader";
 
 const items = [
   {
-    title: "Enjoy the great cold",
+    title: "Con Dao - Beauty that touches the soul ❤️",
     content: "6,879 properties",
     src: "/images/content/live-pic-1.png",
     srcSet: "/images/content/live-pic-1@2x.png",
-    url: "/stays-category",
+    url: "/test_360",
   },
   {
-    title: "Pick up the earliest sunrise",
+    title: "Con Dao - Beauty that touches the soul ❤️",
     content: "9,849 properties",
     src: "/images/content/live-pic-2.png",
     srcSet: "/images/content/live-pic-2@2x.png",
-    url: "/stays-category",
+    url: "/test_360",
   },
   {
-    title: "Unique stay",
+    title: "Con Dao - Beauty that touches the soul ❤️",
     content: "12,879 properties",
     src: "/images/content/live-pic-3.png",
     srcSet: "/images/content/live-pic-3@2x.png",
-    url: "/stays-category",
+    url: "/test_360",
   },
 ];
 
@@ -97,12 +97,12 @@ const Live = ({ title }) => {
             ))}
           </Slider>
         </div>
-        <div className={styles.btns}>
+        {/* <div className={styles.btns}>
           <button className={cn("button-stroke button-small", styles.button)}>
             <Loader className={styles.loader} />
             <span>Load more</span>
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,0 +1,568 @@
+﻿<krpano version="1.21" title="Virtual Tour">
+
+	<include url="skin/vtourskin.xml" />
+	<include url="plugins/callout.xml" />
+	<include url="plugins/circle_hotspots.xml"/>
+
+	<!-- add the callout plugin -->
+	<callout 
+	key="your license key" 
+	size="10" 
+	color="0xffffff"
+	rotate="45"
+	distancepopup="5"   
+	min_fov="180" 
+	max_fov="0" 
+	line_lenght="100"
+	line_width="2" 
+	shape="round"
+	circle_active_width="50"
+	animation="center_screen" 
+	text_width="300"
+	callout_bg_border="0,0,0,2"
+	text_x="10"
+	css_title="color:#fff;font-size:12px;"
+	css_text="color:#fff;font-size:12px;text-shadow: 3px 3px 8px #000000;"
+	title_background="0x2DB2A9"
+	text_background=""
+	title_padding="10"
+	text_padding="10 10 0 0"
+	
+/>
+	<!-- customize skin settings: maps, gyro, webvr, thumbnails, tooltips, layout, design, ... -->
+	<skin_settings maps="false"
+	               maps_type="google"
+	               maps_bing_api_key=""
+	               maps_google_api_key=""
+	               maps_zoombuttons="false"
+	               gyro="true"
+	               webvr="true"
+	               webvr_gyro_keeplookingdirection="false"
+	               webvr_prev_next_hotspots="true"
+	               littleplanetintro="false" 
+	               title="true"
+	               thumbs="true"
+	               thumbs_width="120" thumbs_height="80" thumbs_padding="10" thumbs_crop="0|40|240|160"
+	               thumbs_opened="false"
+	               thumbs_text="true"
+	               thumbs_dragging="true"
+	               thumbs_onhoverscrolling="false"
+	               thumbs_scrollbuttons="false"
+	               thumbs_scrollindicator="false"
+	               thumbs_loop="false"
+	               tooltips_buttons="false"
+	               tooltips_thumbs="false"
+	               tooltips_hotspots="false"
+	               tooltips_mapspots="false"
+	               deeplinking="false"
+	               loadscene_flags="MERGE"
+	               loadscene_blend="OPENBLEND(0.5, 0.0, 0.75, 0.05, linear)"
+	               loadscene_blend_prev="SLIDEBLEND(0.5, 180, 0.75, linear)"
+	               loadscene_blend_next="SLIDEBLEND(0.5,   0, 0.75, linear)"
+	               loadingtext=""
+	               layout_width="100%"
+	               layout_maxwidth="814"
+	               controlbar_width="-24"
+	               controlbar_height="40"
+	               controlbar_offset="20"
+	               controlbar_offset_closed="-40"
+	               controlbar_overlap.no-fractionalscaling="10"
+	               controlbar_overlap.fractionalscaling="0"
+	               design_skin_images="vtourskin.png"
+	               design_bgcolor="0x2D3E50"
+	               design_bgalpha="0.8"
+	               design_bgborder="0"
+	               design_bgroundedge="1"
+	               design_bgshadow="0 4 10 0x000000 0.3"
+	               design_thumbborder_bgborder="3 0xFFFFFF 1.0"
+	               design_thumbborder_padding="2"
+	               design_thumbborder_bgroundedge="0"
+	               design_text_css="color:#FFFFFF; font-family:Arial;"
+	               design_text_shadow="1"
+	               />
+
+
+	<style name="infospot"
+		renderer="webgl"
+		type="text"
+		css="color:#FFFFFF; font-size:16px; font-weight:bold; text-align:center;"
+		width="80" height="80"
+		bgroundedge="42"
+		bgalpha="0.75"
+		bgcolor="0x555555"
+		bgborder="1 0xFFFFFF 1"
+		bgshadow="0 0 16 0x0 0.5"
+		txtshadow="0 0 3 0x0 1.0"
+		mergedalpha="false"
+		vcenter="true"
+		oversampling="2"
+		mipmapping="true"
+		zoom="true"
+		capture="false"
+		/>
+	<!--
+	    For an alternative skin design either change the <skin_settings> values 
+	    from above or optionally include one of the predefined designs from below.
+	-->
+	<!-- <include url="skin/vtourskin_design_flat_light.xml"  /> -->
+	<!-- <include url="skin/vtourskin_design_glass.xml"       /> -->
+	<include url="skin/vtourskin_design_ultra_light.xml" />
+	<!-- <include url="skin/vtourskin_design_117.xml"         /> -->
+	<!-- <include url="skin/vtourskin_design_117round.xml"    /> -->
+	<!-- <include url="skin/vtourskin_design_black.xml"       /> -->
+
+
+	<!-- startup action - load the first scene -->
+	<action name="startup" autorun="onstart">
+		if(startscene === null OR !scene[get(startscene)], copy(startscene,scene[0].name); );
+		loadscene(get(startscene), null, MERGE);
+		if(startactions !== null, startactions() );
+	</action>
+	
+	<action name="do_crop_animation" scope="local" args="framewidth, frameheight, framerate">
+		<!-- define local variables -->
+		calc(local.xframes, (caller.imagewidth /framewidth) BOR 0);
+		calc(local.frames, xframes * ((caller.imageheight / frameheight) BOR 0));
+		def(local.frame, integer, 0);
+		
+		<!-- set the first frame -->
+		calc(caller.crop, '0|0|' + framewidth + '|' + frameheight);
+		
+		<!-- do the animation -->
+		setinterval(calc('crop_anim_' + caller.name), calc(1.0 / framerate),
+			if(caller.loaded,
+				inc(frame);
+				if(frame GE frames, if(caller.onlastframe !== null, callwith(caller, onlastframe() ) ); set(frame,0); );
+				mod(xpos, frame, xframes);
+				div(ypos, frame, xframes);
+				Math.floor(ypos);
+				mul(xpos, framewidth);
+				mul(ypos, frameheight);
+				calc(caller.crop, xpos + '|' + ypos + '|' + framewidth + '|' + frameheight);
+			  ,
+				<!-- stop the interval when the hotspot gets removed -->
+				clearinterval(calc('crop_anim_' + caller.name));
+			);
+		);
+	</action>
+
+
+
+	<!--                 Trang Chủ                 -->
+	
+	<scene name="toan_canh" title="Toàn Cảnh Côn Đảo" onstart="" thumburl="panos/trang_chu/toan_canh/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/toan_canh/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/toan_canh/pano_%s.jpg" />
+		</image>
+
+		<!-- hotspots go -->
+		<hotspot name="hon_bay_canh" style="hs_circle" ath="51.205" atv="-1.707" linkedscene="hon_bay_canh" torigin="world" twosided="false" tag="Hòn Bảy Cạnh"/>
+		<hotspot name="hon_cau" style="hs_circle" ath="29.723" atv="-2.145" linkedscene="hon_cau" tag="Hòn Cau"/>
+		<hotspot name="di_tich_nha_tu_phu_hai" style="hs_circle" ath="21.105" atv="20.213" linkedscene="di_tich_nha_tu_phu_hai" tag="Di Tích Nhà Tù Phú Hải" />
+		<hotspot name="bao_tang_con_dao" style="hs_circle" ath="4.628" atv="9.609" linkedscene="bao_tang_con_dao" tag="Bảo Tàng Côn Đảo"/>
+		<hotspot name="hoang_hon_con_dao" style="hs_circle" ath="-87.475" atv="-2.197" linkedscene="hoang_hon_con_dao" tag="Hoàng Hôn Côn Đảo"/>
+		<hotspot name="hon_ba" style="hs_circle" ath="172.833" atv="-5.090" linkedscene="hon_ba" tag="Hòn Bà" />
+
+
+		<!-- information hotspot -->
+		<hotspot name="spot3" onclick="openurl('https://saigoncondao.com/');" style="callout" ath="43.641" atv="26.951" title="Sài Gòn Côn Đảo Resort" content="Khách sạn 3 sao" />
+
+
+	
+	</scene>
+
+	<scene name="hon_bay_canh" title="Hòn Bảy Cạnh" onstart="" thumburl="panos/trang_chu/hon_bay_canh/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/hon_bay_canh/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/hon_bay_canh/pano_%s.jpg" />
+		</image>
+		<hotspot name="toan_canh" style="hs_circle" ath="-6.000" atv="-2.000" linkedscene="toan_canh" tag="Toàn Cảnh Côn Đảo" />
+		<hotspot name="toan_canh_bai_bo_dap" style="hs_circle" ath="10.053" atv="15.909" linkedscene="toan_canh_bai_bo_dap" tag="Toàn Cảnh Bãi Bờ Đập" />
+		<hotspot name="rung_ngap_man" style="hs_circle" ath="1.886" atv="38.888" linkedscene="rung_ngap_man" tag="Rừng Ngập Mặn" />
+		<hotspot name="tram_kiem_lam" style="hs_circle" ath="-21.626" atv="56.537" linkedscene="tram_kiem_lam" tag="Trạm Kiểm Lâm" />
+		<hotspot name="bai_cat_lon" style="hs_circle" ath="-13.582" atv="68.076" linkedscene="bai_cat_lon" tag="Bãi Cát Lớn" />
+
+		
+	</scene>
+
+	<scene name="hon_cau" title="Hòn Cau" onstart="" thumburl="panos/trang_chu/hon_cau/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/hon_cau/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/hon_cau/pano_%s.jpg" />
+		</image>
+		<hotspot name="toan_canh" style="hs_circle" ath="-129.172" atv="-1.009" linkedscene="toan_canh" tag="Toàn Cảnh Côn Đảo" />
+		<hotspot name="khu_luu_tru" style="hs_circle" ath="-4.575" atv="21.666" linkedscene="khu_luu_tru" tag="Khu Lưu Trú" />
+		<hotspot name="khu_an_uong" style="hs_circle" ath="-16.457" atv="21.412" linkedscene="khu_an_uong" tag="Khu Ăn Uống" />
+		<hotspot name="vuon_dua" style="hs_circle" ath="-23.908" atv="14.727" linkedscene="vuon_dua" tag="Vườn Dừa" />
+
+		
+	</scene>
+
+ 	<scene name="di_tich_nha_tu_phu_hai" title="Di Tích Nhà Tù Phú Hải" onstart="" thumburl="panos/trang_chu/di_tich_nha_tu_phu_hai/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/di_tich_nha_tu_phu_hai/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/di_tich_nha_tu_phu_hai/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-0.725" atv="13.457" onclick="skin_loadscene(di_tich_nha_tu_phu_hai_ben_trong, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-175.691" atv="28.864" onclick="skin_loadscene(toan_canh, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+	
+	<scene name="hoang_hon_con_dao" title="Hoàng Hôn Côn Đảo" onstart="" thumburl="panos/trang_chu/hoang_hon_con_dao/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/hoang_hon_con_dao/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/hoang_hon_con_dao/pano_%s.jpg" />
+		</image>
+		<hotspot name="toan_canh" style="hs_circle" ath="-152.980" atv="-4.756" linkedscene="toan_canh" tag="Toàn Cảnh Côn Đảo" />
+
+		
+	</scene>
+
+	<scene name="bao_tang_con_dao" title="Bảo Tàng Côn Đảo" onstart="" thumburl="panos/trang_chu/bao_tang_con_dao/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/bao_tang_con_dao/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/bao_tang_con_dao/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-164.714" atv="13.263" onclick="skin_loadscene(toan_canh, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="13.099" atv="14.320" onclick="skin_loadscene(san_bao_tang, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+	<scene name="hon_ba" title="Hòn Bà" onstart="" thumburl="panos/trang_chu/hon_ba/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/trang_chu/hon_ba/preview.jpg" />
+
+		<image>
+			<cube url="panos/trang_chu/hon_ba/pano_%s.jpg" />
+		</image>
+		<hotspot name="choi_vong_canh" style="hs_circle" ath="108.658" atv="-0.184" linkedscene="choi_vong_canh" tag="Chòi Vọng Cảnh"/>
+		<hotspot name="bai_dam_quoc" style="hs_circle" ath="173.621" atv="6.800" linkedscene="bai_dam_quoc" tag="Bãi Đầm Quốc"/>
+		<hotspot name="cay_vet" style="hs_circle" ath="179.682" atv="9.162" linkedscene="cay_vet" tag="Cây Vẹt Hennessi" />
+		<hotspot name="cay_coc_do" style="hs_circle" ath="176.207" atv="9.380" linkedscene="cay_coc_do" tag="Cây Cóc Đỏ" />
+		<hotspot name="bai_cat_lon_hon_ba" style="hs_circle" ath="169.603" atv="20.617" linkedscene="bai_cat_lon_hon_ba" tag="Bãi Cát Lớn Hòn Bà" />
+		<hotspot name="toan_canh" style="hs_circle" ath="18.961" atv="-8.415" linkedscene="toan_canh" tag="Toàn Cảnh Côn Đảo"/>
+
+		
+	</scene>
+
+
+
+
+	<!--                  Hòn Bảy Cạnh                 -->
+
+	<scene name="toan_canh_bai_bo_dap" title="Toàn Cảnh Bãi Bờ Đập" onstart="" thumburl="panos/hon_bay_canh/toan_canh_bai_bo_dap/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_bay_canh/toan_canh_bai_bo_dap/preview.jpg" />
+
+		<image>
+			<cube url="panos/hon_bay_canh/toan_canh_bai_bo_dap/pano_%s.jpg" />
+		</image>
+		<hotspot name="hon_bay_canh" style="hs_circle" ath="157.539" atv="1.739" linkedscene="hon_bay_canh" tag="Toàn Cảnh Hòn Bảy Cạnh" />
+		<hotspot name="rung_ngap_man" style="hs_circle" ath="141.201" atv="11.368" linkedscene="rung_ngap_man" tag="Rừng Ngập Mặn" />
+
+		
+	</scene>
+
+
+	<scene name="rung_ngap_man" title="Rừng Ngập Mặn" onstart="" thumburl="panos/hon_bay_canh/rung_ngap_man/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_bay_canh/rung_ngap_man/preview.jpg" />
+
+		<image>
+			<cube url="panos/hon_bay_canh/rung_ngap_man/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-96.044" atv="6.391" onclick="skin_loadscene(tram_kiem_lam, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-2.781" atv="43.282" onclick="skin_loadscene(toan_canh_bai_bo_dap, get(skin_settings.loadscene_blend))" />
+		<!-- <hotspot name="spot3" style="callout" line_lenght="0" line_width="0" text_x="0" rotate="0" size="0" color="0x00ffff" ath="-2.781" atv="44.282" title="Toàn Cảnh Bãi Bờ Đập" /> -->
+
+		
+	</scene>
+
+
+	<scene name="tram_kiem_lam" title="Trạm Kiểm Lâm Hòn Bảy Cạnh" onstart="" thumburl="panos/hon_bay_canh/tram_kiem_lam/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_bay_canh/tram_kiem_lam/preview.jpg" />
+
+		<image>
+			<cube url="panos/hon_bay_canh/tram_kiem_lam/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="84.922" atv="35.556" onclick="skin_loadscene(rung_ngap_man, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-155.386" atv="27.439" onclick="skin_loadscene(bai_cat_lon, get(skin_settings.loadscene_blend))"/>
+		<hotspot name="spot3" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-88.032" atv="37.605" onclick="skin_loadscene(hon_bay_canh, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+
+	<scene name="bai_cat_lon" title="Bãi Cát Lớn Hòn Bảy Cạnh" onstart="" thumburl="panos/hon_bay_canh/bai_cat_lon/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_bay_canh/bai_cat_lon/preview.jpg" />
+
+		<image>
+			<cube url="panos/hon_bay_canh/bai_cat_lon/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-130.764" atv="21.060" onclick="skin_loadscene(hon_bay_canh, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="49.494" atv="4.613" onclick="skin_loadscene(tram_kiem_lam, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+	
+
+
+
+	<!--                 Hòn Cau                 -->
+	
+	<scene name="khu_luu_tru" title="Khu Lưu Trú" onstart="" thumburl="panos/hon_cau/khu_luu_tru/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_cau/khu_luu_tru/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_cau/khu_luu_tru/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-41.843" atv="13.077" onclick="skin_loadscene(khu_an_uong, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-135.036" atv="21.149" onclick="skin_loadscene(hon_cau, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+	<scene name="khu_an_uong" title="Khu Ăn Uống" onstart="" thumburl="panos/hon_cau/khu_an_uong/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_cau/khu_an_uong/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_cau/khu_an_uong/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-61.925" atv="32.641" onclick="skin_loadscene(vuon_dua, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="145.509" atv="30.202" onclick="skin_loadscene(hon_cau, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot3" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="82.129" atv="54.586" onclick="skin_loadscene(khu_luu_tru, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+	<scene name="vuon_dua" title="Vườn Dừa" onstart="" thumburl="panos/hon_cau/vuon_dua/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_cau/vuon_dua/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_cau/vuon_dua/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-28.624" atv="16.789" onclick="skin_loadscene(hon_cau, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-78.847" atv="21.924" onclick="skin_loadscene(khu_an_uong, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+
+	<!--                   Di Tich Nha Tu Phu Hai                 -->
+	<scene name="di_tich_nha_tu_phu_hai_ben_trong" title="Di Tích Nhà Tù Phú Hải Bên Trong" onstart="" thumburl="panos/di_tich_nha_tu_phu_hai/di_tich_nha_tu_phu_hai_ben_trong/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/di_tich_nha_tu_phu_hai/di_tich_nha_tu_phu_hai_ben_trong/thumb.jpg" />
+
+		<image>
+			<cube url="panos/di_tich_nha_tu_phu_hai/di_tich_nha_tu_phu_hai_ben_trong/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-130.324" atv="10.243" onclick="skin_loadscene(phong_giam_so_sau, get(skin_settings.loadscene_blend))" />
+		
+
+
+		
+	</scene>
+
+
+
+	<scene name="phong_giam_so_sau" title="Phòng Giam Số 6" onstart="" thumburl="panos/di_tich_nha_tu_phu_hai/di_tich_nha_tu_phu_hai_ben_trong/phong_giam_so_sau/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/di_tich_nha_tu_phu_hai/di_tich_nha_tu_phu_hai_ben_trong/phong_giam_so_sau/thumb.jpg" />
+
+		<image>
+			<cube url="panos/di_tich_nha_tu_phu_hai/di_tich_nha_tu_phu_hai_ben_trong/phong_giam_so_sau/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot1" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="127.693" atv="13.867" onclick="skin_loadscene(di_tich_nha_tu_phu_hai, get(skin_settings.loadscene_blend))" />
+
+
+
+		
+	</scene>
+
+
+
+
+	<!--              Bảo Tàng              -->
+	<scene name="san_bao_tang" title="Sân Bảo Tàng" onstart="" thumburl="panos/bao_tang_con_dao/san_bao_tang/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/bao_tang_con_dao/san_bao_tang/thumb.jpg" />
+
+		<image>
+			<cube url="panos/bao_tang_con_dao/san_bao_tang/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="87.527" atv="19.465" onclick="skin_loadscene(hanh_lang_bao_tang, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot3" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-91.421" atv="19.599" onclick="skin_loadscene(bao_tang_con_dao, get(skin_settings.loadscene_blend))" />
+
+
+
+		
+	</scene>
+
+	<scene name="hanh_lang_bao_tang" title="Hành Lang Bảo Tàng" onstart="" thumburl="panos/bao_tang_con_dao/san_bao_tang/hanh_lang_bao_tang/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/bao_tang_con_dao/san_bao_tang/hanh_lang_bao_tang/thumb.jpg" />
+
+		<image>
+			<cube url="panos/bao_tang_con_dao/san_bao_tang/hanh_lang_bao_tang/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="179.552" atv="37.532" onclick="skin_loadscene(phong_khanh_tiet, get(skin_settings.loadscene_blend))" />
+		<hotspot name="spot3" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-0.070" atv="16.815" onclick="skin_loadscene(san_bao_tang, get(skin_settings.loadscene_blend))" />
+
+
+
+		
+	</scene>
+
+
+	<scene name="phong_khanh_tiet" title="Phòng Khánh Tiết" onstart="" thumburl="panos/bao_tang_con_dao/san_bao_tang/hanh_lang_bao_tang/phong_khanh_tiet/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/bao_tang_con_dao/san_bao_tang/hanh_lang_bao_tang/phong_khanh_tiet/thumb.jpg" />
+
+		<image>
+			<cube url="panos/bao_tang_con_dao/san_bao_tang/hanh_lang_bao_tang/phong_khanh_tiet/pano_%s.jpg" />
+		</image>
+		<hotspot name="spot2" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="176.852" atv="18.088" onclick="skin_loadscene(bao_tang_con_dao, get(skin_settings.loadscene_blend))" />
+
+
+
+		
+	</scene>
+
+
+
+	<!--             Hòn Bà            -->
+
+	<scene name="choi_vong_canh" title="Chòi Vọng Cảnh" onstart="" thumburl="panos/hon_ba/choi_vong_canh/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_ba/choi_vong_canh/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_ba/choi_vong_canh/pano_%s.jpg" />
+		</image>
+		<hotspot name="hon_ba" style="hs_circle" ath="-85.370" atv="12.648" linkedscene="hon_ba" tag="Toàn Cảnh Trên Cao Hòn Bà"/>
+
+		
+	</scene>
+
+	<scene name="bai_dam_quoc" title="Bãi Đầm Quốc" onstart="" thumburl="panos/hon_ba/bai_dam_quoc/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_ba/bai_dam_quoc/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_ba/bai_dam_quoc/pano_%s.jpg" />
+		</image>
+		<hotspot name="hon_ba" style="hs_circle" ath="-21.728" atv="-2.476" linkedscene="hon_ba" tag="Hòn Bà" />
+		<hotspot name="cay_vet" style="hs_circle" ath="-36.589" atv="17.132" linkedscene="cay_vet" tag="Cây Vẹt Hennessi"/>
+		<hotspot name="cay_coc_do" style="hs_circle" ath="-17.424" atv="16.798" linkedscene="cay_coc_do" tag="Cây Cóc Đỏ" />
+
+		
+	</scene>
+
+	<scene name="cay_coc_do" title="Cây Cóc Đỏ" onstart="" thumburl="panos/hon_ba/cay_coc_do/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_ba/cay_coc_do/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_ba/cay_coc_do/pano_%s.jpg" />
+		</image>
+		<hotspot name="cay_vet" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-151.220" atv="20.561" onclick="skin_loadscene(cay_vet, get(skin_settings.loadscene_blend))" />
+		<hotspot name="bai_cat_lon_hon_ba" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="6.325" atv="26.676" onclick="skin_loadscene(bai_cat_lon_hon_ba, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+	<scene name="cay_vet" title="Cây Vẹt Hennessi" onstart="" thumburl="panos/hon_ba/cay_vet/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_ba/cay_vet/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_ba/cay_vet/pano_%s.jpg" />
+		</image>
+		<hotspot name="cay_coc_do" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="32.043" atv="22.727" onclick="skin_loadscene(cay_coc_do, get(skin_settings.loadscene_blend))" />
+		<hotspot name="bai_dam_quoc" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-167.135" atv="25.958" onclick="skin_loadscene(bai_dam_quoc, get(skin_settings.loadscene_blend))" />
+		
+		
+	</scene>
+
+	<scene name="bai_cat_lon_hon_ba" title="Bãi Cát Lớn Hòn Bà" onstart="" thumburl="panos/hon_ba/bai_cat_lon_hon_ba/thumb.jpg" lat="" lng="" heading="">
+
+		<view hlookat="0.0" vlookat="0.0" fovtype="MFOV" fov="120" maxpixelzoom="2.0" fovmin="70" fovmax="140" limitview="auto" />
+
+		<preview url="panos/hon_ba/bai_cat_lon_hon_ba/thumb.jpg" />
+
+		<image>
+			<cube url="panos/hon_ba/bai_cat_lon_hon_ba/pano_%s.jpg" />
+		</image>
+		<hotspot name="hon_ba" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="108.860" atv="28.234" onclick="skin_loadscene(hon_ba, get(skin_settings.loadscene_blend))" />
+		<hotspot name="cay_coc_do" url="skin/dan_duong.png" onloaded="do_crop_animation(128,128,20);" ath="-34.376" atv="9.964" onclick="skin_loadscene(cay_coc_do, get(skin_settings.loadscene_blend))" />
+
+		
+	</scene>
+
+</krpano>

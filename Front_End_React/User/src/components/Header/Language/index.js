@@ -13,7 +13,12 @@ const Language = ({ className, items }) => {
       <div
         className={cn(className, styles.language, { [styles.active]: visible })}
       >
-        <button className={styles.head} onClick={() => setVisible(!visible)}>
+        <button className={styles.head} 
+          // {/* onClick={() => setVisible(!visible)}> */}
+          onClick={(event) => {
+            event.preventDefault();
+            alert("Language options are developing"); 
+          }}>
           <Icon name="globe" size="16" />
           <div className={styles.text}>Language</div>
         </button>

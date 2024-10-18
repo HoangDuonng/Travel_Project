@@ -31,7 +31,7 @@ const Main = () => {
         </div>
         <Panel
           className={styles.panel}
-          menu
+          // menu
           classBody={styles.body}
           onSearch={() => console.log("Search")}
         >

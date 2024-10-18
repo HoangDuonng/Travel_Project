@@ -31,7 +31,11 @@ const Catalog = () => {
                   className={cn(styles.link, {
                     [styles.active]: x.title === sorting,
                   })}
-                  onClick={() => setSorting(x.title)}
+                  // onClick={() => setSorting(x.title)}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    alert(`${x.title} đang được chọn!`);
+                  }}
                   key={index}
                 >
                   <Icon name={x.icon} size="16" />
@@ -63,11 +67,11 @@ const Catalog = () => {
                 <Card className={styles.card} item={x} key={index} />
               ))}
           </div>
-          <div className={styles.btns}>
+          {/* <div className={styles.btns}>
             <button className={cn("button-stroke button-small", styles.button)}>
               View all
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

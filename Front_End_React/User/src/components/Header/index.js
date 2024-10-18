@@ -13,17 +13,17 @@ import Login from "../Login";
 
 const travelers = [
   {
-    title: "Stays",
+    title: "Home",
     url: "/",
     icon: "comment",
   },
   {
-    title: "Flights",
+    title: "Blogs",
     url: "/flights",
     icon: "email",
   },
   {
-    title: "Things to do",
+    title: "Hotels",
     url: "/things-to-do",
     icon: "home",
   },
@@ -128,17 +128,22 @@ const Header = ({ separatorHeader, wide, notAuthorized }) => {
               Support
             </NavLink>
             <Language className={styles.language} items={languages} />
-            <NavLink
+            {/* <NavLink
               className={cn("button-stroke button-small", styles.button)}
               activeClassName={styles.active}
               to="/list-your-property"
             >
               List your property
-            </NavLink>
+            </NavLink> */}
           </div>
           <Notification className={styles.notification} />
           {notAuthorized ? (
-            <button className={styles.login} onClick={() => setVisible(true)}>
+            <button className={styles.login} 
+              onClick={() => setVisible(true)}>
+               {/* onClick={(event) => { */}
+              {/* //   event.preventDefault();
+              //   alert("Login is developing"); 
+              // }}> */}
               <Icon name="user" size="24" />
             </button>
           ) : (
@@ -150,7 +155,12 @@ const Header = ({ separatorHeader, wide, notAuthorized }) => {
           ></button>
         </div>
       </div>
-      <Modal visible={visible} onClose={() => setVisible(false)}>
+      <Modal visible={visible} 
+        onClose={() => setVisible(false)}>
+        {/* // onClose={(event) => { */}
+        //   event.preventDefault();
+        //   alert("Login is developing");
+        {/* // }}> */}
         <Login />
       </Modal>
     </>

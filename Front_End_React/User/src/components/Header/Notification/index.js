@@ -47,7 +47,11 @@ const Notification = ({ className }) => {
               <Link
                 className={styles.item}
                 to={x.url}
-                onClick={() => setVisible(!visible)}
+                // onClick={() => setVisible(!visible)}
+                onClick={(event) => {
+                  event.preventDefault();
+                  alert("Notification is developing");
+                }}
                 key={index}
               >
                 <div className={styles.avatar}>

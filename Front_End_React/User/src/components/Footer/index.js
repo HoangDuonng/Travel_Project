@@ -34,7 +34,8 @@ const Footer = () => {
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e) => {
-    alert();
+    e.preventDefault();
+    alert("Subscribe developing");
   };
 
   return (
@@ -56,7 +57,7 @@ const Footer = () => {
               <Theme className={styles.theme} />
             </div>
           </div>
-          <div className={styles.col}>
+          {/* <div className={styles.col}>
             <div className={styles.menu}>
               {items.map((x, index) => (
                 <Link className={styles.link} to={x.url} key={index}>
@@ -64,7 +65,7 @@ const Footer = () => {
                 </Link>
               ))}
             </div>
-          </div>
+          </div> */}
           <div className={styles.col}>
             <div className={styles.info}>
               Join our community{" "}
@@ -76,7 +77,8 @@ const Footer = () => {
               className={styles.form}
               value={email}
               setValue={setEmail}
-              onSubmit={() => handleSubmit()}
+              // onSubmit={() => handleSubmit()}
+              onSubmit={handleSubmit}
               placeholder="Enter your email"
               type="email"
               name="email"
@@ -86,7 +88,8 @@ const Footer = () => {
         </div>
         <div className={styles.bottom}>
           <div className={styles.copyright}>
-            Copyright © 2021 UI8 LLC. All rights reserved
+            {/* Copyright © 2024 UI8 LLC. All rights reserved */}
+            Made with ❤️ by NguUyen. All rights reserved
           </div>
         </div>
       </div>

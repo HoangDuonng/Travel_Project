@@ -23,7 +23,11 @@ const User = ({ className, items }) => {
                     className={styles.item}
                     activeClassName={styles.active}
                     to={x.url}
-                    onClick={() => setVisible(!visible)}
+                    // onClick={() => setVisible(!visible)}
+                    onClick = {(event) => {
+                      event.preventDefault();
+                      alert("This is developing");
+                    }}
                     key={index}
                   >
                     <div className={styles.icon}>
@@ -47,6 +51,7 @@ const User = ({ className, items }) => {
             <button className={cn("button-stroke button-small", styles.button)}>
               Log out
             </button>
+            // các button ở đây sẽ không hoạt động vì đã bị chặn bởi event.preventDefault() ở dòng 107
           </div>
         </div>
       </div>

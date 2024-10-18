@@ -8,11 +8,15 @@ import Icon from "../../Icon";
 const Dropdown = ({ className, items, setValue }) => {
   const [visible, setVisible] = useState(false);
 
-  const handleClick = (x) => {
-    setVisible(false);
-    setValue(false);
+  
+  const handleClick = (event, items) => {
+    event.preventDefault();
+    alert(`${items.title} is developing.`);
   };
-
+  // const handleClick = (x) => {
+  //   setVisible(false);
+  //   setValue(false);
+  // };
   return (
     <OutsideClickHandler onOutsideClick={() => setVisible(false)}>
       <div
@@ -29,7 +33,8 @@ const Dropdown = ({ className, items, setValue }) => {
               activeClassName={styles.active}
               key={index}
               to={x.url}
-              onClick={() => handleClick(x)}
+              onClick={(event) => handleClick(event, x)}
+              // onClick={() => handleClick(x)}
               exact
             >
               <Icon name={x.icon} size="24" />
