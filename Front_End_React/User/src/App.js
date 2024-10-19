@@ -36,6 +36,66 @@ function App() {
   return (
     <Router>
       <Switch>
+      <Route
+          exact
+          path="/con_dao_360"
+          render={() => (
+              <iframe 
+                src=".\360_VR\Con_Dao\tour.html"
+                title="Embedded Page"
+                style={{ 
+                  width: '100%', 
+                  height: '100vh',
+                  display: 'block'   
+                }} 
+              />
+          )}
+        />
+        <Route
+          exact
+          path="/phong_nha_360"
+          render={() => (
+              <iframe 
+                src=".\360_VR\Phong_Nha\tour.html"
+                title="Embedded Page"
+                style={{ 
+                  width: '100%', 
+                  height: '100vh',
+                  display: 'block'   
+                }} 
+              />
+          )}
+        />
+        <Route
+          exact
+          path="/da_nang_360"
+          render={() => (
+              // <iframe 
+              //   src=".\360_VR\Phong_Nha\tour.html"
+              //   title="Embedded Page"
+              //   style={{ 
+              //     width: '100%', 
+              //     height: '100vh',
+              //     display: 'block'   
+              //   }} 
+              // />
+              <div style={{ 
+                width: '100%', 
+                height: '100vh', 
+                display: 'flex', 
+                justifyContent: 'center', 
+                alignItems: 'center',
+                textAlign: 'center',
+                fontSize: '24px',
+                color: '#555'
+              }}>
+                This page is currently under development.<br />
+                Please check back later!<br />
+                  <br />
+                Thank you for visiting. ❤️
+              </div>
+          )}
+        />
         <Route
           exact
           path="/"
@@ -54,22 +114,6 @@ function App() {
             </Page>
           )}
         />
-        <Route
-          exact
-          path="/test_360"
-          render={() => (
-              <iframe 
-                src=".\360_VR\tour.html"
-                title="Embedded Page"
-                style={{ 
-                  width: '100%', 
-                  height: '100vh',
-                  display: 'block'   
-                }} 
-              />
-          )}
-        />
-
         <Route
           exact
           path="/stays-product"

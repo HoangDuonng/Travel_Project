@@ -51,7 +51,7 @@ const User = ({ className, items }) => {
             <button className={cn("button-stroke button-small", styles.button)}>
               Log out
             </button>
-            // các button ở đây sẽ không hoạt động vì đã bị chặn bởi event.preventDefault() ở dòng 107
+            {/* File gốc FE là không có tương tác cái gì cả */}
           </div>
         </div>
       </div>

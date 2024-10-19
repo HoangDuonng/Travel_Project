@@ -12,21 +12,21 @@ const items = [
     content: "6,879 properties",
     src: "/images/content/live-pic-1.png",
     srcSet: "/images/content/live-pic-1@2x.png",
-    url: "/test_360",
+    url: "/con_dao_360",
   },
   {
-    title: "Con Dao - Beauty that touches the soul ❤️",
+    title: "Phong Nha Ke Bang - The First-Ranked Cave Wonder ❤️",
     content: "9,849 properties",
     src: "/images/content/live-pic-2.png",
     srcSet: "/images/content/live-pic-2@2x.png",
-    url: "/test_360",
+    url: "/phong_nha_360",
   },
   {
-    title: "Con Dao - Beauty that touches the soul ❤️",
+    title: "Da Nang - The most livable city in Vietnam ❤️",
     content: "12,879 properties",
     src: "/images/content/live-pic-3.png",
     srcSet: "/images/content/live-pic-3@2x.png",
-    url: "/test_360",
+    url: "/da_nang_360",
   },
 ];
 
