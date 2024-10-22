@@ -24,12 +24,12 @@ const NewProduct = () => {
       <div className={styles.row}>
         <div className={styles.col}>
           {/* Comment hai cái cảnh báo do cái thư viện kia */}
-          {/* <NameAndDescription className={styles.card} /> */}
+          <NameAndDescription className={styles.card} />
           <ImagesAndCTA className={styles.card} />
           <Price className={styles.card} />
           <CategoryAndAttibutes className={styles.card} />
           <ProductFiles className={styles.card} />
-          {/* <Discussion className={styles.card} /> */}
+          <Discussion className={styles.card} />
         </div>
         <div className={styles.col}>
           <Preview

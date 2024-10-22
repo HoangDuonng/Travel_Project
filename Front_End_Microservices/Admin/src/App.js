@@ -4,6 +4,7 @@ import Page from "./components/Page";
 import Home from "./screens/Home";
 import ProductsDashboard from "./screens/ProductsDashboard";
 import NewProduct from "./screens/NewProduct";
+import NewUser from "./screens/NewUser";
 import Drafts from "./screens/Drafts";
 import Released from "./screens/Released";
 import Comments from "./screens/Comments";
@@ -108,6 +109,15 @@ function App() {
           render={() => (
             <Page title="Customer list">
               <CustomerList />
+            </Page>
+          )}
+        />
+        <Route
+          exact
+          path="/customers/add"
+          render={() => (
+            <Page title="New User">
+              <NewUser />
             </Page>
           )}
         />

@@ -34,13 +34,14 @@ const Details = ({ className, onClose }) => {
         <Icon name="close" size="20" />
       </button>
       <Head className={styles.head} />
-      <Editor
+      {/* Gây ra cảnh báo do thư viện của nó */}
+      {/* <Editor
         state={content}
         onChange={setContent}
         classEditor={styles.editor}
         label="Private note"
         tooltip="Description Private note"
-      />
+      /> */}
       <div className={styles.group}>
         <a
           className={styles.line}

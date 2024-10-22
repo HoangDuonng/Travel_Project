@@ -24,14 +24,15 @@ const Comments = ({ className, onClose }) => {
             <Icon name="close" size="24" />
           </button>
         </div>
-        <Editor
+        {/* Gây cảnh báo do thư viện của Editor */}
+        {/* <Editor
           state={content}
           onChange={setContent}
           classEditor={styles.editor}
           label="Review this product?"
           tooltip="You’re product owner"
           button="Comment"
-        />
+        /> */}
         <div className={styles.list}>
           {commentsProduct.map((x, index) => (
             <Item className={styles.item} item={x} key={index} />

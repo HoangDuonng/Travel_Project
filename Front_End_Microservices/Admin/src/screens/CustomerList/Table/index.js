@@ -1,18 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Table.module.sass";
 import cn from "classnames";
 import Checkbox from "../../../components/Checkbox";
 import Loader from "../../../components/Loader";
 import Row from "./Row";
+import userServices from "../../../services/api/users"; 
 
 // data
 import { customers } from "../../../mocks/customers";
 
+
+
 const Table = ({ className, activeTable, setActiveTable }) => {
   const [chooseAll, setСhooseAll] = useState(false);
   const [activeId, setActiveId] = useState(customers[0].id);
-
   const [selectedFilters, setSelectedFilters] = useState([]);
+
+  const [users, setUsers] = useState([]);
 
   const handleChange = (id) => {
     if (selectedFilters.includes(id)) {
@@ -21,6 +25,23 @@ const Table = ({ className, activeTable, setActiveTable }) => {
       setSelectedFilters((selectedFilters) => [...selectedFilters, id]);
     }
   };
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const { data: users } = await userServices.getUsers();
+        setUsers(users);
+        console.log("Users: ", users);
+        // setActiveId(users);  // Nếu cần cập nhật state
+        // setLoading(false);   // Nếu cần cập nhật trạng thái loading
+      } catch (error) {
+        console.error("Error fetching users: ", error.message);
+        // setLoading(false);   // Nếu cần cập nhật trạng thái loading
+      }
+    };
+
+    getUser();
+  }, []);
 
   return (
     <div className={cn(styles.wrapper, className)}>
@@ -35,12 +56,12 @@ const Table = ({ className, activeTable, setActiveTable }) => {
           </div>
           <div className={styles.col}>Name</div>
           <div className={styles.col}>Email</div>
-          <div className={styles.col}>Purchase</div>
-          <div className={styles.col}>Lifetime</div>
+          <div className={styles.col}>Phone</div>
           <div className={styles.col}>Comments</div>
           <div className={styles.col}>Likes</div>
+          <div className={styles.col}>Role</div>
         </div>
-        {customers.map((x, index) => (
+        {users.map((x, index) => (
           <Row
             item={x}
             key={index}
@@ -53,12 +74,12 @@ const Table = ({ className, activeTable, setActiveTable }) => {
           />
         ))}
       </div>
-      <div className={styles.foot}>
+      {/* <div className={styles.foot}>
         <button className={cn("button-stroke button-small", styles.button)}>
           <Loader className={styles.loader} />
           <span>Load more</span>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };

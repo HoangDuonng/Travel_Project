@@ -1,6 +1,7 @@
 const express = require('express');
-const path = require("path");
+const path = require('path');
 const cookieParser = require('cookie-parser');
+const cors = require('cors')
 
 
 const db = require('./config/database');
@@ -20,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(fileUpload());
 app.use(express.json());
+app.use(cors());
+app.use('/images', express.static(path.join(__dirname, 'public', 'images')));
+app.use("/images", express.static("images"))
 
 // Router
 app.get('/hello', (req, res) => {

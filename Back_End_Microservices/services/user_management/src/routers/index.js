@@ -34,7 +34,7 @@ router.post('/files', postUploadMultipleFileAPI);
 
 
 // User
-router.get("/users", verifyToken, getAllUser);
+router.get("/users", getAllUser);
 router.get("/user", getAUser);
 router.post("/register", createAUser);
 router.put("/user", updateAUser);
